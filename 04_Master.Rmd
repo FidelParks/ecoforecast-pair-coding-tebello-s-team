@@ -12,7 +12,6 @@ knitr::opts_chunk$set(echo = TRUE)
 First we'll _source()_ (i.e. "run all code in") the scripts with the functions we made. Then we'll set the URL, read in the data with _download.NDVI()_, and plot it with _plot.NDVI()_.
 
 ```{r}
-## Load required functions by running source() on the individual function files
 if(file.exists("01_download.NDVI.R")) source("01_download.NDVI.R")
 if(file.exists("02_plot.NDVI.R"))     source("02_plot.NDVI.R")
 if(file.exists("03_negexp.R"))        source("03_negexp.R")
@@ -32,7 +31,7 @@ plot.NDVI(dat)
 
 Q1: This plot suggests that Fynbos greenness (NDVI) as observed from satellite saturates with time since fire. Why do you think it saturates rather than increasing linearly with time?
 
->*Answer 1:*
+>*Answer 1:* Because the satellite collects data only from above, it can only view the fynbos on a 2D plane with a finite area. It cannot account for the vertical growth of the fynbos that would be increasing more linearly.
 
 <br>
 
@@ -49,9 +48,9 @@ First the simpler model:
 par <- c(alpha = 0.2, gamma = 0.4, lambda = 0.5)
 
 # fit model
-fit_negexp <- nls(NDVI ~ alpha + gamma * (1 - exp(- age/lambda)),
-                  data = dat, start = par, trace = F, 
+fit_negexp <- nls(NDVI ~ alpha + gamma * (1 - exp(- age/lambda)),                data = dat, start = par, trace = F, 
                   control = nls.control(maxiter = 500))
+  
 
 # plot
 plot.NDVI(dat = dat, fit = fit_negexp)
@@ -99,7 +98,7 @@ Lots more parameters...
 
 Q2: How do the estimates for the common parameters compare?
 
->*Answer 2:*
+>*Answer 2:* The full model slightly decreases the proposed effect of alpha and also increases the proposed effect of gamma. For both of these the standard error and evidence against the null hypothesis remain relatively constant. In the full model, the proposed effect of lambda is more noticeably decreased. With that its standard error is more greatly decreased and its evidence against the null hypothesis is greatly increased.
 
 <br>
 
@@ -117,11 +116,11 @@ anova(fit_negexp, fit_negexpS)
 
 Q3: Which model is better?
 
->*Answer 3:*
+>*Answer 3:* The simple model has a residual sum of squares of 0.72 whereas the full model has a residual sum of squares of 0.45. This means that the full model is better because it does a far better job of describing the variance in the data set.
 
 Q4: How many degrees of freedom are there in this ANOVA and why (i.e. what are they)?
 
->*Answer 4:*
+>*Answer 4:* The simple model has 135 degrees of freedom, because it has 138 observations minus 3 variables whereas the full model has 133 degrees of freedom, because it has 138 observations minus 5 variables. The model has 2 degrees of freedom because the full model has two more variables.
 
 <br>
 
@@ -214,7 +213,7 @@ AIC_simple - AIC_full
 
 Q5: Is there a preferred model and if so, which one?
 
->*Answer 5:*
+>*Answer 5:* Yes. The full model has a far lower AIC of 451 155.3 compared to that of the simple model's 718 113.1. The difference in AIC is 266 957.8 which is quite large which indicates that the difference is significant enough for the full model to be preferred. 
 
 <br>
 
@@ -232,6 +231,6 @@ You'll notice that these are completely different to the AICs for the MLE models
 
 Q6: Why is it not okay to compare the AIC of these NLS models with the AIC of the MLE models? Hint: type `?AIC` into the R console and do some reading.
 
->*Answer 6:*
+>*Answer 6:* The results are formed differently and thus exist in two different and incomparable ranges.
 
 <br>
